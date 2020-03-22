@@ -1,9 +1,9 @@
 ## API 구현
 
-* [ ] GET
-* [ ] POST
-* [ ] DELETE
-* [ ] PATCH
+* [x] GET
+* [x] POST
+* [x] DELETE
+* [x] PATCH
 
 ## Client 구현
 
