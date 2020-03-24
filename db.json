@@ -4,7 +4,12 @@
       "id": 1,
       "title": "Todo 1",
       "done": false,
-      "relative": [],
+      "references": [
+        {
+          "id": 2,
+          "done": false
+        }
+      ],
       "registed": 1584610870612,
       "updated": 1584610870612
     }

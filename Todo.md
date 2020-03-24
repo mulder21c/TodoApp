@@ -7,7 +7,7 @@
 
 ## Client 구현
 
-* [ ] 기본 UI build
+* [x] 기본 UI build
 * [ ] Listing
   * [ ] Pagination <br>
       기능 구현 요구 사항이므로 Client에서 구현 진행
