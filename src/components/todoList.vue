@@ -11,11 +11,13 @@
 
 <script>
 import todoItem from "./todoItem";
-import { mapGetters } from "vuex";
 
 export default {
-  computed: {
-    ...mapGetters(["todos"])
+  props: {
+    todos: {
+      type: Array,
+      require: true
+    }
   },
   components: {
     todoItem

@@ -8,8 +8,8 @@
 ## Client 구현
 
 * [x] 기본 UI build
-* [ ] Listing
-  * [ ] Pagination <br>
+* [x] Listing
+  * [x] Pagination <br>
       기능 구현 요구 사항이므로 Client에서 구현 진행
 * [ ] Cretae
 * [ ] Delete

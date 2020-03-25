@@ -10,6 +10,7 @@ const routes = [
     path: `/`,
     name: `index`,
     component: todoApp,
+    props: route => ({ qurey: route.query.page }),
     beforeEnter(to, from, next) {
       store
         .dispatch("FETCH_LIST")
