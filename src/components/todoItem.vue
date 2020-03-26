@@ -14,13 +14,14 @@
       />
       <span class="sr-only">{{ info.done | state }}</span>
     </button>
+    <span># {{ info.id }}</span>
     <span class="todo__body">
       <span class="todo__title">
         {{ info.title }}
       </span>
-      <span v-if="info.references.length" class="todo__reference-wrapper">
+      <span v-if="references.length" class="todo__reference-wrapper">
         <span
-          v-for="reference in info.references"
+          v-for="reference in references"
           :key="reference.id"
           :class="{ 'todo__reference--done': reference.done }"
         >
@@ -43,6 +44,9 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faSquare } from "@fortawesome/free-regular-svg-icons";
 import { faCheckSquare, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import { mapGetters } from "vuex";
+import flatMap from "lodash/flatMap";
+import filter from "lodash/filter";
 
 fontAwesomeLibrary.add(faSquare, faCheckSquare, faPencilAlt, faTimes);
 
@@ -51,6 +55,16 @@ export default {
     info: {
       type: Object,
       required: true
+    }
+  },
+  computed: {
+    ...mapGetters(["todos"]),
+    references() {
+      const { references } = this.info;
+
+      return flatMap(references, reference =>
+        filter(this.todos, todo => todo.id === reference)
+      );
     }
   },
   filters: {

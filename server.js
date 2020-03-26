@@ -14,11 +14,14 @@ const middleware = jsonServer.defaults(config);
 server.use(middleware);
 server.use(jsonServer.bodyParser);
 
-server.use(jsonServer.rewriter({
-  "/todo": "/list",
-  "/todo/*": "/list/$1",
-  "/todo/:id": "/list/:id",
-}));
+server.use(
+  jsonServer.rewriter({
+    "/todo": "/list?_sort=id&_order=desc",
+    "/todo/:id": "/list/:id",
+    "/todo/*": "/list/$1",
+    "/todo?*": "/list/$1"
+  })
+);
 
 server.use(router);
 server.listen(port, () => {

@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { fetchList } from "../api/index";
+import { fetchList, pushTodo } from "../api/index";
 
 Vue.use(Vuex);
 
@@ -11,11 +11,19 @@ export default new Vuex.Store({
   mutations: {
     SET_LIST(state, list) {
       state.todoList = list;
+    },
+    ADD_ITEM(state, item) {
+      state.todoList = [item, ...state.todoList];
     }
   },
   actions: {
     FETCH_LIST({ commit }) {
       return fetchList().then(response => commit("SET_LIST", response.data));
+    },
+    ADD_ITEM({ commit }, paylod) {
+      return pushTodo(paylod).then(response =>
+        commit("ADD_ITEM", response.data)
+      );
     }
   },
   getters: {

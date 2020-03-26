@@ -1,14 +1,46 @@
 <template>
   <div class="todo__form">
-    <input type="text" name="title" id="toto-title" class="todo__textfield" />
-    <button type="button" class="todo__button todo__button--search">
+    <input
+      v-model="title"
+      type="text"
+      name="title"
+      id="toto-title"
+      class="todo__textfield"
+    />
+    <button
+      type="button"
+      class="todo__button todo__button--search"
+      @click="searchTodo()"
+    >
       Search
     </button>
-    <button type="submit" class="todo__button todo__button--add">
+    <button
+      type="submit"
+      class="todo__button todo__button--add"
+      @click="addTodo()"
+    >
       Add
     </button>
   </div>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      title: ``
+    };
+  },
+  methods: {
+    addTodo() {
+      this.$emit(`addTodo`, this.title);
+    },
+    searchTodo() {
+      this.$emit(`searchTodo`, this.title);
+    }
+  }
+};
+</script>
 
 <style lang="scss" scoped>
 .todo {

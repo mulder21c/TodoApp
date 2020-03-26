@@ -1,6 +1,6 @@
 <template>
   <div class="todo-wrap">
-    <todoForm />
+    <todoForm @addTodo="handleAddTodo" />
     <todoList :todos="displayToods" />
     <pagenation :info="pageInfo" />
   </div>
@@ -10,7 +10,7 @@
 import todoForm from "../components/todoForm";
 import todoList from "../components/todoList";
 import pagenation from "../components/pagenation";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   data() {
@@ -43,11 +43,39 @@ export default {
     this.updateDisplayTodos();
   },
   methods: {
+    ...mapActions(["ADD_ITEM"]),
     updateDisplayTodos() {
-      console.log(this.currentPage);
       const startIdx = (this.currentPage - 1) * this.countPerPage;
       const endIdx = startIdx + this.countPerPage;
       this.displayToods = this.todos.slice(startIdx, endIdx);
+    },
+    async handleAddTodo(payload) {
+      let str = payload;
+      const references = [];
+      let missingReference = [];
+      const referencePattern = /(?:\s@)(\d+)(?=\s|$)/g;
+      const matches = str.matchAll(referencePattern);
+      for (let match of matches) {
+        const reference = this.todos.filter(todo => todo.id == match[1]);
+        if (reference.lenght) references.push(match[1] * 1);
+        else missingReference.push(match[1]);
+      }
+
+      if (missingReference.length) {
+        alert(`@${missingReference.join(`,`)}은 없는 할 일 목록입니다.`);
+        return;
+      }
+
+      const params = {
+        title: str.replace(referencePattern, ``),
+        references,
+        done: false,
+        registed: new Date().getTime(),
+        updated: new Date().getTime()
+      };
+
+      await this.ADD_ITEM(params);
+      this.updateDisplayTodos();
     }
   },
   watch: {
