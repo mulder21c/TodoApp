@@ -4,6 +4,7 @@
       type="button"
       :aria-checked="info.done | stringize"
       class="todo__state"
+      @click="toggleState()"
     >
       <font-awesome-icon
         :icon="[
@@ -35,6 +36,10 @@
     <button type="button" class="todo__delete" aria-label="삭제">
       <font-awesome-icon :icon="['fas', 'times']" />
     </button>
+    <div class="todo__dates">
+      <span>작성일: {{ info.registed | timeToString }}</span>
+      <span>최종수정일: {{ info.updated | timeToString }}</span>
+    </div>
   </div>
 </template>
 
@@ -47,6 +52,8 @@ import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { mapGetters } from "vuex";
 import flatMap from "lodash/flatMap";
 import filter from "lodash/filter";
+import { changeState } from "../api";
+import moment from "moment";
 
 fontAwesomeLibrary.add(faSquare, faCheckSquare, faPencilAlt, faTimes);
 
@@ -63,8 +70,14 @@ export default {
       const { references } = this.info;
 
       return flatMap(references, reference =>
-        filter(this.todos, todo => todo.id === reference)
+        filter(this.todos, todo => todo.id == reference)
       );
+    },
+    dependencies() {
+      const { id } = this.info;
+      return filter(this.todos, todo => {
+        return todo.references.includes(id);
+      });
     }
   },
   filters: {
@@ -73,10 +86,42 @@ export default {
     },
     state(value) {
       return value ? `완료` : `미완료`;
+    },
+    timeToString(value) {
+      return moment(value).format(`YY.MM.DD HH:mm`);
     }
   },
   components: {
     FontAwesomeIcon
+  },
+  methods: {
+    async toggleState() {
+      const notCompleted = this.references.filter(reference => !reference.done);
+      const complatedDependency = this.dependencies.filter(
+        dependency => dependency.done
+      );
+
+      if (notCompleted.length) {
+        alert(`참조된 할 일이 완료되어야 완료 처리가 가능합니다.`);
+        return;
+      }
+
+      if (complatedDependency.length) {
+        alert(`상위 항목이 완료되어 변경이 불가능합니다.`);
+        return;
+      }
+
+      changeState(this.info.id, !this.info.done)
+        .then(() => {
+          this.info.done = !this.info.done;
+        })
+        .catch(err => {
+          alert(
+            `오류가 발생하여 처리되지 않았습니다.\n잠시 후 다시 시도해주세요.`
+          );
+          console.log(err);
+        });
+    }
   }
 };
 </script>
@@ -87,7 +132,7 @@ export default {
 
   &__item {
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: row wrap;
     justify-content: space-between;
     align-items: center;
     border-top: 1px dashed gray;
@@ -131,6 +176,25 @@ export default {
   &__reference {
     &-wrapper {
       font-size: 0.85em;
+    }
+    &--done {
+      text-decoration: line-through;
+    }
+  }
+  &__title {
+    #{$done-item} & {
+      text-decoration: line-through;
+    }
+  }
+  &__dates {
+    flex: 1 0 100%;
+    margin-top: 1em;
+    text-align: right;
+    font-size: 0.75em;
+    color: gray;
+
+    > span:first-child {
+      margin-right: 1em;
     }
   }
 }

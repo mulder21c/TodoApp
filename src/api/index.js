@@ -8,4 +8,8 @@ function pushTodo(params) {
   return axios.post(`http://localhost:8881/todo`, params);
 }
 
-export { fetchList, pushTodo };
+function changeState(id, done) {
+  return axios.patch(`http://localhost:8881/todo/${id}`, { done });
+}
+
+export { fetchList, pushTodo, changeState };

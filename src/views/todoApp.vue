@@ -55,10 +55,16 @@ export default {
       let missingReference = [];
       const referencePattern = /(?:\s@)(\d+)(?=\s|$)/g;
       const matches = str.matchAll(referencePattern);
+      const title = str.replace(referencePattern, ``);
       for (let match of matches) {
         const reference = this.todos.filter(todo => todo.id == match[1]);
-        if (reference.lenght) references.push(match[1] * 1);
+        if (reference.length) references.push(match[1] * 1);
         else missingReference.push(match[1]);
+      }
+
+      if (!title.length) {
+        alert(`할 일 이름을 작성해주세요`);
+        return;
       }
 
       if (missingReference.length) {
@@ -67,7 +73,7 @@ export default {
       }
 
       const params = {
-        title: str.replace(referencePattern, ``),
+        title,
         references,
         done: false,
         registed: new Date().getTime(),
