@@ -1,7 +1,7 @@
 <template>
   <div class="todo-wrap">
     <todoForm @addTodo="handleAddTodo" />
-    <todoList :todos="displayToods" />
+    <todoList :todos="displayToods" @deleteTodo="handleDeleteTodo" />
     <pagenation :info="pageInfo" />
   </div>
 </template>
@@ -43,13 +43,13 @@ export default {
     this.updateDisplayTodos();
   },
   methods: {
-    ...mapActions(["ADD_ITEM"]),
+    ...mapActions(["ADD_ITEM", "DELETE_ITEM"]),
     updateDisplayTodos() {
       const startIdx = (this.currentPage - 1) * this.countPerPage;
       const endIdx = startIdx + this.countPerPage;
       this.displayToods = this.todos.slice(startIdx, endIdx);
     },
-    async handleAddTodo(payload) {
+    handleAddTodo(payload) {
       let str = payload;
       const references = [];
       let missingReference = [];
@@ -80,8 +80,14 @@ export default {
         updated: new Date().getTime()
       };
 
-      await this.ADD_ITEM(params);
-      this.updateDisplayTodos();
+      this.ADD_ITEM(params).then(() => {
+        this.updateDisplayTodos();
+      });
+    },
+    handleDeleteTodo(payload) {
+      this.DELETE_ITEM(payload).then(() => {
+        this.updateDisplayTodos();
+      });
     }
   },
   watch: {

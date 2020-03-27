@@ -5,6 +5,7 @@
       :key="todo.id"
       :info="todo"
       role="listitem"
+      @deleteTodo="deleteTodo"
     />
   </div>
 </template>
@@ -21,6 +22,11 @@ export default {
   },
   components: {
     todoItem
+  },
+  methods: {
+    deleteTodo(payload) {
+      this.$emit(`deleteTodo`, payload);
+    }
   }
 };
 </script>

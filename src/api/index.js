@@ -12,4 +12,8 @@ function changeState(id, done) {
   return axios.patch(`http://localhost:8881/todo/${id}`, { done });
 }
 
-export { fetchList, pushTodo, changeState };
+function deleteTodo(id) {
+  return axios.delete(`http://localhost:8881/todo/${id}`);
+}
+
+export { fetchList, pushTodo, changeState, deleteTodo };

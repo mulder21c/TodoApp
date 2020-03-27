@@ -13,8 +13,8 @@
       기능 구현 요구 사항이므로 Client에서 구현 진행
 * [x] Cretae
 * [x] Check/unchecked done state
-* [ ] Delete
+* [x] Delete
 * [ ] Modify
-* [ ] Attach Reference
+* [x] Attach Reference
 * [ ] Search
 * [ ] Filtering / Sorting

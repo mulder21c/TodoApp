@@ -33,7 +33,12 @@
     <button type="button" class="todo__edit" aria-label="수정">
       <font-awesome-icon :icon="['fas', 'pencil-alt']" />
     </button>
-    <button type="button" class="todo__delete" aria-label="삭제">
+    <button
+      type="button"
+      class="todo__delete"
+      aria-label="삭제"
+      @click="deleteTodo()"
+    >
       <font-awesome-icon :icon="['fas', 'times']" />
     </button>
     <div class="todo__dates">
@@ -95,7 +100,7 @@ export default {
     FontAwesomeIcon
   },
   methods: {
-    async toggleState() {
+    toggleState() {
       const notCompleted = this.references.filter(reference => !reference.done);
       const complatedDependency = this.dependencies.filter(
         dependency => dependency.done
@@ -121,6 +126,13 @@ export default {
           );
           console.log(err);
         });
+    },
+    deleteTodo() {
+      if (this.dependencies.length) {
+        alert(`상위 항목이 있으므로 삭제가 불가합니다`);
+        return;
+      }
+      this.$emit(`deleteTodo`, this.info);
     }
   }
 };
