@@ -5,6 +5,7 @@
       :todo="modifyObject"
       @addTodo="handleAddTodo"
       @patchTodo="handlePatchTodo"
+      @searchTodo="handleSearchTodo"
     />
     <todoList
       :todos="displayToods"
@@ -21,6 +22,8 @@ import todoList from "../components/todoList";
 import pagenation from "../components/pagenation";
 import { mapGetters, mapActions } from "vuex";
 import reject from "lodash/reject";
+import moment from "moment-timezone";
+moment.tz.setDefault(`Asia-Soule`);
 
 export default {
   data() {
@@ -55,7 +58,7 @@ export default {
     this.updateDisplayTodos();
   },
   methods: {
-    ...mapActions(["ADD_ITEM", "DELETE_ITEM", "PATCH_ITEM"]),
+    ...mapActions(["ADD_ITEM", "DELETE_ITEM", "PATCH_ITEM", "SEARCH_TODOS"]),
     updateDisplayTodos() {
       const startIdx = (this.currentPage - 1) * this.countPerPage;
       const endIdx = startIdx + this.countPerPage;
@@ -131,6 +134,67 @@ export default {
 
       this.formMode = `add`;
       this.modifyObject = null;
+    },
+    handleSearchTodo(payload) {
+      const regExp = /(?=(?:.*(reg:\S*))?)(?=(?:.*(is:\S*))?).*/g;
+      const dateRegExp = /(^\d{4})(?:[.-]*)(?:(\d{2})?)(?:[.-]*)(?:(\d{2})?)$/g;
+      const regResult = regExp.exec(payload);
+      const params = {};
+      params.title = regResult.reduce((acc, group) => {
+        if (!group) return acc;
+        const pair = group.split(":");
+        params[pair[0]] = pair[1];
+        acc = acc.replace(group, ``).trim();
+        return acc;
+      });
+
+      if (params.reg) {
+        params.reg =
+          dateRegExp.test(params.reg) &&
+          params.reg
+            .replace(/[^\d]/g, ``)
+            .replace(
+              /(^\d{4})(?:(\d{2})?)(?:(\d{2})?)$/g,
+              (match, $1, $2, $3) => {
+                return `${$1}` + ($2 ? `-${$2}` : ``) + ($3 ? `-${$3}` : ``);
+              }
+            );
+        if (!params.reg || !moment(params.reg).isValid()) {
+          alert(`유효한 날짜 형식이 아닙니다.`);
+          return;
+        }
+        switch (params.reg.length) {
+          case 4:
+            params.registed_gte = moment(
+              `${params.reg}-01-01 00:00:00`
+            ).valueOf();
+            params.registed_lte =
+              moment(params.registed_gte)
+                .add(`years`, 1)
+                .valueOf() - 1;
+            break;
+          case 7:
+            params.registed_gte = moment(`${params.reg}-01 00:00:00`).valueOf();
+            params.registed_lte =
+              moment(params.registed_gte)
+                .add(`months`, 1)
+                .valueOf() - 1;
+            break;
+          case 10:
+            params.registed_gte = moment(`${params.reg} 00:00:00`).valueOf();
+            params.registed_lte =
+              moment(params.registed_gte)
+                .add(`days`, 1)
+                .valueOf() - 1;
+            break;
+        }
+        delete params.reg;
+      }
+
+      this.SEARCH_TODOS(params).then(() => {
+        this.currentPage = 1;
+        this.updateDisplayTodos();
+      });
     }
   },
   watch: {

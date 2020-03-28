@@ -7,7 +7,7 @@ const config = {
   noCors: false,
   noGzip: false,
   host: `localhost`,
-  port,
+  port
 };
 const middleware = jsonServer.defaults(config);
 
@@ -19,12 +19,12 @@ server.use(
     "/todo": "/list?_sort=id&_order=desc",
     "/todo/:id": "/list/:id",
     "/todo/*": "/list/$1",
-    "/todo?*": "/list/$1"
+    "/todo?*": "/list?$1"
   })
 );
 
 server.use(router);
 server.listen(port, () => {
-  const {host} = config;
+  const { host } = config;
   console.log(`JSON Server is running at http://${host}:${port}`);
-})
+});

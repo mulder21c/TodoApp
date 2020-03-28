@@ -1,6 +1,12 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { fetchList, pushTodo, deleteTodo, patchTodo } from "../api/index";
+import {
+  fetchList,
+  pushTodo,
+  deleteTodo,
+  patchTodo,
+  searchTodo
+} from "../api/index";
 import findIndex from "lodash/findIndex";
 
 Vue.use(Vuex);
@@ -23,6 +29,9 @@ export default new Vuex.Store({
     PATCH_ITEM(state, item) {
       const idx = findIndex(state.todoList, todo => todo.id == item.id);
       state.todoList.splice(idx, 1, item);
+    },
+    SEARCH_TODOS(state, list) {
+      state.todoList = list;
     }
   },
   actions: {
@@ -42,6 +51,11 @@ export default new Vuex.Store({
     },
     DELETE_ITEM({ commit }, item) {
       return deleteTodo(item.id).then(() => commit("DELETE_ITEM", item));
+    },
+    SEARCH_TODOS({ commit }, options) {
+      return searchTodo(options).then(response =>
+        commit("SEARCH_TODOS", response.data)
+      );
     }
   },
   getters: {

@@ -16,5 +16,5 @@
 * [x] Delete
 * [x] Modify
 * [x] Attach Reference
-* [ ] Search
+* [x] Search
 * [ ] Filtering / Sorting

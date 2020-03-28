@@ -8,6 +8,7 @@
       class="todo__textfield"
     />
     <button
+      v-if="mode != `modify`"
       type="button"
       class="todo__button todo__button--search"
       @click="searchTodo()"
