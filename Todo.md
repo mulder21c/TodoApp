@@ -14,7 +14,7 @@
 * [x] Cretae
 * [x] Check/unchecked done state
 * [x] Delete
-* [ ] Modify
+* [x] Modify
 * [x] Attach Reference
 * [ ] Search
 * [ ] Filtering / Sorting

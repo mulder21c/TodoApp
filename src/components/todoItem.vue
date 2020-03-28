@@ -30,7 +30,13 @@
         </span>
       </span>
     </span>
-    <button type="button" class="todo__edit" aria-label="수정">
+    <button
+      type="button"
+      class="todo__edit"
+      aria-label="수정"
+      :ref="`btn-modify`"
+      @click="modifyTodo()"
+    >
       <font-awesome-icon :icon="['fas', 'pencil-alt']" />
     </button>
     <button
@@ -57,7 +63,7 @@ import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { mapGetters } from "vuex";
 import flatMap from "lodash/flatMap";
 import filter from "lodash/filter";
-import { changeState } from "../api";
+import { patchTodo } from "../api";
 import moment from "moment";
 
 fontAwesomeLibrary.add(faSquare, faCheckSquare, faPencilAlt, faTimes);
@@ -116,7 +122,7 @@ export default {
         return;
       }
 
-      changeState(this.info.id, !this.info.done)
+      patchTodo(this.info.id, { done: !this.info.done })
         .then(() => {
           this.info.done = !this.info.done;
         })
@@ -133,6 +139,9 @@ export default {
         return;
       }
       this.$emit(`deleteTodo`, this.info);
+    },
+    modifyTodo() {
+      this.$emit(`modifyTodo`, this.info);
     }
   }
 };
@@ -194,6 +203,9 @@ export default {
     }
   }
   &__title {
+    box-sizing: border-box;
+    width: 90%;
+    text-align: center;
     #{$done-item} & {
       text-decoration: line-through;
     }

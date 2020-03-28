@@ -6,6 +6,7 @@
       :info="todo"
       role="listitem"
       @deleteTodo="deleteTodo"
+      @modifyTodo="modifyTodo"
     />
   </div>
 </template>
@@ -26,6 +27,9 @@ export default {
   methods: {
     deleteTodo(payload) {
       this.$emit(`deleteTodo`, payload);
+    },
+    modifyTodo(payload) {
+      this.$emit(`modifyTodo`, payload);
     }
   }
 };

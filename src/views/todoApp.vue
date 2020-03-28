@@ -1,7 +1,16 @@
 <template>
   <div class="todo-wrap">
-    <todoForm @addTodo="handleAddTodo" />
-    <todoList :todos="displayToods" @deleteTodo="handleDeleteTodo" />
+    <todoForm
+      :mode="formMode"
+      :todo="modifyObject"
+      @addTodo="handleAddTodo"
+      @patchTodo="handlePatchTodo"
+    />
+    <todoList
+      :todos="displayToods"
+      @modifyTodo="handleModifyTodo"
+      @deleteTodo="handleDeleteTodo"
+    />
     <pagenation :info="pageInfo" />
   </div>
 </template>
@@ -11,6 +20,7 @@ import todoForm from "../components/todoForm";
 import todoList from "../components/todoList";
 import pagenation from "../components/pagenation";
 import { mapGetters, mapActions } from "vuex";
+import reject from "lodash/reject";
 
 export default {
   data() {
@@ -18,7 +28,9 @@ export default {
       displayToods: [],
       countPerPage: 5,
       currentPage: this.$route.query.page * 1 || 1,
-      pageSize: 10
+      pageSize: 10,
+      formMode: `add`,
+      modifyObject: {}
     };
   },
   components: {
@@ -43,19 +55,18 @@ export default {
     this.updateDisplayTodos();
   },
   methods: {
-    ...mapActions(["ADD_ITEM", "DELETE_ITEM"]),
+    ...mapActions(["ADD_ITEM", "DELETE_ITEM", "PATCH_ITEM"]),
     updateDisplayTodos() {
       const startIdx = (this.currentPage - 1) * this.countPerPage;
       const endIdx = startIdx + this.countPerPage;
       this.displayToods = this.todos.slice(startIdx, endIdx);
     },
-    handleAddTodo(payload) {
-      let str = payload;
+    resolveTodoBody(str) {
       const references = [];
       let missingReference = [];
       const referencePattern = /(?:\s@)(\d+)(?=\s|$)/g;
       const matches = str.matchAll(referencePattern);
-      const title = str.replace(referencePattern, ``);
+      const title = str.replace(referencePattern, ``).trim();
       for (let match of matches) {
         const reference = this.todos.filter(todo => todo.id == match[1]);
         if (reference.length) references.push(match[1] * 1);
@@ -72,9 +83,18 @@ export default {
         return;
       }
 
-      const params = {
+      return {
         title,
-        references,
+        references: [...new Set(references)]
+      };
+    },
+    handleAddTodo(payload) {
+      const obj = this.resolveTodoBody(payload);
+      if (!obj) return;
+
+      const params = {
+        title: obj.title,
+        references: obj.references,
         done: false,
         registed: new Date().getTime(),
         updated: new Date().getTime()
@@ -88,6 +108,29 @@ export default {
       this.DELETE_ITEM(payload).then(() => {
         this.updateDisplayTodos();
       });
+    },
+    handleModifyTodo(payload) {
+      this.formMode = `modify`;
+      this.modifyObject = payload;
+    },
+    handlePatchTodo(payload) {
+      const { id, title } = payload;
+      const obj = this.resolveTodoBody(title);
+      if (!obj) return;
+
+      const params = {
+        id,
+        title: obj.title,
+        references: reject(obj.references, reference => reference == id),
+        updated: new Date().getTime()
+      };
+
+      this.PATCH_ITEM(params).then(() => {
+        this.updateDisplayTodos();
+      });
+
+      this.formMode = `add`;
+      this.modifyObject = null;
     }
   },
   watch: {

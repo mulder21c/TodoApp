@@ -15,6 +15,15 @@
       Search
     </button>
     <button
+      v-if="mode == `modify`"
+      type="submit"
+      class="todo__button todo__button--modify"
+      @click="modifyTodo()"
+    >
+      Modify
+    </button>
+    <button
+      v-if="mode == `add`"
       type="submit"
       class="todo__button todo__button--add"
       @click="addTodo()"
@@ -26,6 +35,14 @@
 
 <script>
 export default {
+  props: {
+    mode: {
+      type: String
+    },
+    todo: {
+      type: Object
+    }
+  },
   data() {
     return {
       title: ``
@@ -34,9 +51,25 @@ export default {
   methods: {
     addTodo() {
       this.$emit(`addTodo`, this.title);
+      this.title = ``;
     },
     searchTodo() {
       this.$emit(`searchTodo`, this.title);
+    },
+    modifyTodo() {
+      this.$emit(`patchTodo`, { id: this.todo.id, title: this.title });
+    }
+  },
+  watch: {
+    todo(item) {
+      if (item) {
+        this.title = `${item.title}${item.references.reduce(
+          (acc, reference) => acc + ` @${reference}`,
+          ``
+        )}`;
+      } else {
+        this.title = ``;
+      }
     }
   }
 };
@@ -78,7 +111,8 @@ export default {
     &--search {
       background-color: lightseagreen;
     }
-    &--add {
+    &--add,
+    &--modify {
       background-color: darkslateblue;
     }
   }
